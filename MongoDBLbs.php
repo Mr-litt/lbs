@@ -2,14 +2,14 @@
 
 class MongoDBLbs
 {
-    private $pageCount = 10;
+    private $pageCount = 2;
     /** @var MongoDB\Driver\Manager */
     private $mongoManager;
 
     public function __construct($config = array())
     {
         $host = isset($config['host']) ? $config['host'] : '127.0.0.1';
-        $port = isset($config['port']) ? $config['port'] : '6309';
+        $port = isset($config['port']) ? $config['port'] : '27017';
         $manager = new MongoDB\Driver\Manager("mongodb://{$host}:{$port}");
         $this->setMongoManager($manager);
     }
@@ -78,7 +78,7 @@ class MongoDBLbs
             ),
         );
         if ($maxDistance) {
-            $filter['$maxDistance'] = $maxDistance;
+            $filter['loc']['$maxDistance'] = $maxDistance;
         }
         if ($where) {
             $filter = array_merge($filter, $where);
@@ -99,8 +99,7 @@ class MongoDBLbs
         return $list;
     }
 
-
-    public function geoNearFindReturnDistance($lon, $lat, $maxDistance = 0, $where = array(), $page = 0)
+    public function geoNearFindReturnDistance($lon, $lat, $maxDistance = 0, $where = array(), $num = 0)
     {
         $params = array(
             'geoNear' => "location",
@@ -111,6 +110,9 @@ class MongoDBLbs
 
         if ($maxDistance) {
             $params['maxDistance'] = $maxDistance;
+        }
+        if ($num) {
+            $params['num'] = $num;
         }
         if ($where) {
             $params['query'] = $where;
@@ -124,3 +126,13 @@ class MongoDBLbs
         return $list;
     }
 }
+
+/*
+$lbs = new MongoDBLbs();
+//$result = $lbs->geoAdd(1, 120.20, 20.20);
+//$lbs->geoAdd(2, 125.20, 25.20);
+//$result = $lbs->geoAdd(3, 113.20, 13.20);
+//$result = $lbs->geoAdd(4, 108.20, 8.20);
+//$result = $lbs->geoNearFind(120.20, 20.20, 10, array('uin' => array('$in' => array(2,3,4))), $page=1);
+//$result = $lbs->geoNearFindReturnDistance(120.20, 20.20, 1500/6371, array('uin' => array('$in' => array(2,3,4))), 1);
+var_dump($result);*/
